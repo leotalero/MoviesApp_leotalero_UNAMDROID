@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MoviesApp</string>
+    <string name="error_message">Error loading data</string>
+    <string name="search_by_popular">Search by Popular</string>
+    <string name="search_by_top_rated">Search by Top Rated</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="original_title">Original Title:</string>
+    <string name="search">Search</string>
+</resources>
