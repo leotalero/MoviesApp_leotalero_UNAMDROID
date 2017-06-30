@@ -151,7 +151,10 @@ public class DetailActivity extends AppCompatActivity implements
                    }
 
                 }else{
-                    deleteInFavorites(mMovie, mVideos, mReview);
+                    if(isInFavorites){
+                        deleteInFavorites(mMovie, mVideos, mReview);
+                    }
+
                      mFavoritebutton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_grey));
                 }
 
@@ -185,7 +188,7 @@ public class DetailActivity extends AppCompatActivity implements
 
     private void deleteInFavorites(MovieClass mMovie, List<Video> mVideos, List<Review> mReview) {
 
-
+        isInFavorites=false;
         String stringId = Integer.toString(mMovie.mid);
         Uri uri = MovieFavContract.MovieFavEntry.CONTENT_URI;
         uri = uri.buildUpon().appendPath(stringId).build();
@@ -227,6 +230,7 @@ public class DetailActivity extends AppCompatActivity implements
         // Display the URI that's returned with a Toast
         // [Hint] Don't forget to call finish() to return to MainActivity after this insert is complete
         if(uri != null) {
+            isInFavorites =true;
             Toast.makeText(getBaseContext(),  R.string.save_fav, Toast.LENGTH_LONG).show();
         }
     }
@@ -284,7 +288,7 @@ public class DetailActivity extends AppCompatActivity implements
         if (data != null && data.moveToFirst()) {
             /* We have valid data, continue on to bind the data to the UI */
             cursorHasValidData = true;
-            isInFavorites =true;
+
         }
 
         if (!cursorHasValidData) {
@@ -310,6 +314,10 @@ public class DetailActivity extends AppCompatActivity implements
                 ,data.getString(data.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_VIDEOS_JSON))
                 ,data.getString(data.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_REVIEWS_JSON))
         );
+
+            isInFavorites =true;
+        
+
         fillData(movie);
 
     }
