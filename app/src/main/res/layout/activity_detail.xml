@@ -92,9 +92,52 @@
                     android:text="New Text"
                     android:id="@+id/movie_over"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_gravity="center"
+                android:textColor="@android:color/white"
+                android:background="#55000000"
+                android:text="New Text"
+                android:id="@+id/movie_id"/>
 
+            <ToggleButton
+                android:id="@+id/myToggleButton"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textOff="@string/favorite_off"
+                android:textOn="@string/favorite_on"
+                android:textAlignment="center"
+                android:textSize="10sp"
+                />
 
-
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/trailers"
+                style="@style/Base.TextAppearance.AppCompat.Large"/>
+            <FrameLayout
+                android:id="@+id/content_videoList"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/reviews"
+                style="@style/Base.TextAppearance.AppCompat.Large"/>
+            <FrameLayout
+                android:id="@+id/content_reviewList"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
         </LinearLayout>
 
 

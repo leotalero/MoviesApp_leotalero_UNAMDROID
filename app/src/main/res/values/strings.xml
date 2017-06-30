@@ -7,4 +7,14 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="original_title">Original Title:</string>
     <string name="search">Search</string>
+    <string name="favorites">Favorites</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+    <string name="favorite_on">Favorite</string>
+    <string name="favorite_off">No Favorite yet!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="save_fav">Saved in favorites</string>
+    <string name="del_fav">deleted from favorites</string>
 </resources>

@@ -6,6 +6,8 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.unam.android.leonardotalero.moviesapp.MovieClass;
 import com.unam.android.leonardotalero.moviesapp.R;
+import com.unam.android.leonardotalero.moviesapp.Review;
+import com.unam.android.leonardotalero.moviesapp.Video;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,14 +28,11 @@ public class MoviesUtils {
     public static List<MovieClass>  getSimpleStringsFromJson(Context context, String forecastJsonStr)
             throws JSONException {
 
-        /* Weather information. Each day's forecast info is an element of the "list" array */
+
         final String OWM_RESULTS= "results";
         final String OWM_PAGE= "page";
         final String OWM_TITTLE_original="original_title";
-        /* All temperatures are children of the "temp" object */
         final String OWM_VOTE_COUNT = "vote_count";
-
-        /* Max temperature for the day */
         final String OWM_ID = "id";
         final String OWM_TITLE = "title";
         final String OWM_DESCR= "description";
@@ -66,7 +65,7 @@ public class MoviesUtils {
                     return null;
             }
         }
-
+      String total_pages=forecastJson.getString("total_pages");
         JSONArray array = forecastJson.getJSONArray(OWM_RESULTS);
 
 
@@ -117,7 +116,7 @@ public class MoviesUtils {
 
 
 
-            MovieClass movieObject= new MovieClass(title,date_release,poster_path,vote_average,over_view,original_title,popularity);
+            MovieClass movieObject= new MovieClass(id,title,date_release,poster_path,vote_average,over_view,original_title,popularity,"","");
             parsedData.add(movieObject);
 
 
@@ -136,6 +135,143 @@ public  static  void setImagePicasso(String urlString, Context context, ImageVie
 
 }
 
+
+
+    public static List<Video>  getListVideosFromJson(Context context, String forecastJsonStr)
+            throws JSONException {
+
+        final String OWM_MESSAGE_CODE = "cod";
+        final String OWM_RESULTS= "results";
+        final String OWM_ID="id";
+        final String OWM_KEY = "key";
+        final String OWM_NAME = "name";
+        final String OWM_SITE = "site";
+        final String OWM_SIZE= "size";
+        final String OWM_TYPE= "type";
+        /* String array to hold each day's weather String */
+        List<Video> parsedData=new ArrayList<Video>();
+
+
+
+        JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+        /* Is there an error? */
+        if (forecastJson.has(OWM_MESSAGE_CODE)) {
+            int errorCode = forecastJson.getInt(OWM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+        }
+
+        JSONArray array = forecastJson.getJSONArray(OWM_RESULTS);
+
+
+
+
+        for (int i = 0; i < array.length(); i++) {
+            String id;
+            String key;
+            String name;
+            String site;
+            String size;
+            String type;
+            String link;
+
+
+            /* Get the JSON object representing the day */
+            JSONObject video = array.getJSONObject(i);
+
+            id = video.getString(OWM_ID);
+            key = video.getString(OWM_KEY);
+            name = video.getString(OWM_NAME);
+            site = video.getString(OWM_SITE);
+            size = video.getString(OWM_SIZE);
+            type = video.getString(OWM_TYPE);
+            link=forecastJsonStr.toString();
+
+            Video videoFinal= new Video(id,key,name,site,size,type,link);
+            parsedData.add(videoFinal);
+
+
+        }
+
+        return parsedData;
+    }
+
+
+
+    public static List<Review>  getListReviewsFromJson(Context context, String forecastJsonStr)
+            throws JSONException {
+
+        final String OWM_MESSAGE_CODE = "cod";
+        final String OWM_RESULTS= "results";
+        final String OWM_ID="id";
+        final String OWM_AUTHOR = "author";
+        final String OWM_CONTENT = "content";
+        final String OWM_URL = "url";
+
+        /* String array to hold each day's weather String */
+        List<Review> parsedData=new ArrayList<Review>();
+
+
+
+        JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+        /* Is there an error? */
+        if (forecastJson.has(OWM_MESSAGE_CODE)) {
+            int errorCode = forecastJson.getInt(OWM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+        }
+
+        JSONArray array = forecastJson.getJSONArray(OWM_RESULTS);
+
+
+
+
+        for (int i = 0; i < array.length(); i++) {
+            String id;
+            String author;
+            String content;
+            String url;
+
+
+
+            /* Get the JSON object representing the day */
+            JSONObject review = array.getJSONObject(i);
+
+            id = review.getString(OWM_ID);
+            author = review.getString(OWM_AUTHOR);
+            content = review.getString(OWM_CONTENT);
+            url = review.getString(OWM_URL);
+            String json=forecastJsonStr.toString();
+
+
+            Review reviewFinal= new Review(id,author,content,url,json);
+            parsedData.add(reviewFinal);
+
+
+        }
+
+        return parsedData;
+    }
 
 
 }

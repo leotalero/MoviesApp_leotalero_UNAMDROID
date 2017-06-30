@@ -1,9 +1,16 @@
 package com.unam.android.leonardotalero.moviesapp;
 
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Parcelable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -19,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.unam.android.leonardotalero.moviesapp.data.MovieFavContract;
 import com.unam.android.leonardotalero.moviesapp.utilities.MoviesUtils;
 import com.unam.android.leonardotalero.moviesapp.utilities.NetworkUtils;
 
@@ -30,7 +38,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        LoaderCallbacks<List<MovieClass>>,FavoriteFragment.OnFragmentInteractionListener{
 
     private EditText mSearchBoxEditText;
     private TextView mUrlDisplayTextView;
@@ -46,6 +55,13 @@ public class MainActivity extends AppCompatActivity {
     private int page=1;
     private Boolean flagLoadingData=false;
     private Boolean adapterLoad=false;
+    private static int LOADER_ID=10;
+    private  URL SearchUrl;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int TASK_LOADER_ID = 10;
+    private Loader<List<MovieClass>> loader;
+    private List<MovieClass> moviesFavorite=new ArrayList<MovieClass>();
+    private boolean favoriteView=false;
 
 
     @Override
@@ -77,28 +93,64 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
+        int loaderId = LOADER_ID;
 
+        /*
+         * From MainActivity, we have implemented the LoaderCallbacks interface with the type of
+         * String array. (implements LoaderCallbacks<String[]>) The variable callback is passed
+         * to the call to initLoader below. This means that whenever the loaderManager has
+         * something to notify us of, it will do so through this callback.
+         */
+        LoaderCallbacks<List<MovieClass>> callback = MainActivity.this;
+
+        /*
+         * The second parameter of the initLoader method below is a Bundle. Optionally, you can
+         * pass a Bundle to initLoader that you can then access from within the onCreateLoader
+         * callback. In our case, we don't actually use the Bundle, but it's here in case we wanted
+         * to.
+         */
+        Bundle bundleForLoader = null;
+
+        /*
+         * Ensures a loader is initialized and active. If the loader doesn't already exist, one is
+         * created and (if the activity/fragment is currently started) starts the loader. Otherwise
+         * the last created loader is re-used.
+         */
+        getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
 
 
     }
 
 
     private void searchQuery(String query,int page) {
-        //String query = mSearchBoxEditText.getText().toString();
-        URL SearchUrl = NetworkUtils.buildUrl(query.toString(),page);
-       // mUrlDisplayTextView.setText(SearchUrl.toString());
-            flagLoadingData=true;
-            new QueryTask().execute(SearchUrl);
+
+        SearchUrl = NetworkUtils.buildUrl(query.toString(),page);
+        Bundle queryBundle = new Bundle();
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<List<MovieClass>> SearchLoader = loaderManager.getLoader(LOADER_ID);
+        if (SearchLoader == null) {
+            loaderManager.initLoader(LOADER_ID, queryBundle, this);
+        } else {
+            loaderManager.restartLoader(LOADER_ID, queryBundle, this);
+        }
+
+            //new QueryTask().execute(SearchUrl);
 
 
     }
 
     private void searchQueryMovie(String query) {
         //String query = mSearchBoxEditText.getText().toString();
-        URL SearchUrl = NetworkUtils.buildUrlSearch(query.toString());
-        // mUrlDisplayTextView.setText(SearchUrl.toString());
-        flagLoadingData=true;
-        new QueryTask().execute(SearchUrl);
+        SearchUrl = NetworkUtils.buildUrlSearch(query.toString());
+        Bundle queryBundle = new Bundle();
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<List<MovieClass>> SearchLoader = loaderManager.getLoader(LOADER_ID);
+        if (SearchLoader == null) {
+            loaderManager.initLoader(LOADER_ID, queryBundle, this);
+        } else {
+            loaderManager.restartLoader(LOADER_ID, queryBundle, this);
+        }
+
 
 
     }
@@ -154,9 +206,69 @@ public class MainActivity extends AppCompatActivity {
             searchQueryMovie(query);
             return true;
         }
+        if (itemThatWasClickedId == R.id.favorites) {
+            query="movie/top_rated";
+            adapterLoad=false;
+            searchFavorites();
+            return true;
+        }
         //buildUrlSearch
         return super.onOptionsItemSelected(item);
     }
+
+    private void searchFavorites() {
+
+     /*   FavoriteFragment favFragment = FavoriteFragment.newInstance("a","b");
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_fragment_fav, favFragment ).commit();*/
+
+        favoriteView=true;
+        String selection=null;
+        String[] selectionArgs=null;
+        Uri uri = MovieFavContract.MovieFavEntry.CONTENT_URI;
+        CursorLoader cursorLoader=new CursorLoader(MainActivity.this,
+                uri,
+                null,
+                selection,
+                selectionArgs,
+                null);
+
+      Cursor cursor=  cursorLoader.loadInBackground();
+
+        if (cursor != null && cursor.moveToFirst()) {
+            /* We have valid data, continue on to bind the data to the UI */
+            if (cursor.moveToFirst()) {
+                do {
+
+                    MovieClass movie=new MovieClass(cursor.getInt(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_ID_MOVIE))
+                            ,cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_TITLE_ORIGINAL))
+                            ,cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_TIMESTAMP_RELEASE_DATE))
+                            ,cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_POSTER))
+                            ,cursor.getDouble(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_VOTE_AVERAGE))
+                            ,cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_DESCRIPTION))
+                            ,cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_TITLE_ORIGINAL)),
+                            cursor.getDouble(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_POPULARITY)),
+                            cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_VIDEOS_JSON)),
+                            cursor.getString(cursor.getColumnIndex(MovieFavContract.MovieFavEntry.COLUMN_REVIEWS_JSON))
+
+                    );
+
+                    moviesFavorite.add(movie);
+                } while (cursor.moveToNext());
+
+            }
+            showJsonDataView();
+            resultMovies.clear();
+            listToArray(moviesFavorite);
+            setData(resultMovies);
+        }else{
+
+        }
+
+    }
+
+
+
 
     public  void listToArray(List<MovieClass> listData) {
         //resultMovies= new ArrayList<MovieClass>();
@@ -165,9 +277,92 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    @Override
+    public Loader<List<MovieClass>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<List<MovieClass>>(this) {
+
+
+            /* This String array will hold and help cache our weather data */
+
+            public List<MovieClass> mDataCache = null;
+            @Override
+            protected void onStartLoading() {
+                if (mDataCache != null) {
+                    deliverResult(mDataCache);
+                } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
+
+
+            }
+
+            @Override
+            public List<MovieClass> loadInBackground() {
+
+
+                //URL searchUrl = NetworkUtils.buildUrlSearch(query.toString());
+                flagLoadingData=true;
+                try {
+
+                    if(NetworkUtils.isOnline()){
+                        String jsonWeatherResponse = NetworkUtils
+                                .getResponseFromHttpUrl(SearchUrl);
+
+                        List<MovieClass> moviesData = MoviesUtils
+                                .getSimpleStringsFromJson(MainActivity.this, jsonWeatherResponse);
+
+                        return moviesData;
+                    }else{
+                        return null;
+                    }
 
 
 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+
+            @Override
+            public void deliverResult(List<MovieClass> data) {
+                mDataCache = data;
+                super.deliverResult(data);
+            }
+        };
+
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<List<MovieClass>> loader, List<MovieClass> data) {
+
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (data != null && !data.equals("")) {
+
+            showJsonDataView();
+            listToArray(data);
+            if (!adapterLoad) {
+                setData(resultMovies);
+            }
+        } else {
+            showErrorMessage();
+        }
+        flagLoadingData=false;
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<MovieClass>> loader) {
+
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 
 
     public class QueryTask extends AsyncTask<URL, Void, List<MovieClass>> {
@@ -230,6 +425,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
     public void setData(ArrayList<MovieClass> SearchResults){
         final GridAdapter gridAdapter;
 
@@ -270,7 +466,7 @@ public class MainActivity extends AppCompatActivity {
                 int FirstVisPos = view.getFirstVisiblePosition();
                 int posible=resultMovies.size();
                 int myLastVisiblePos=view.getLastVisiblePosition();
-                if (myLastVisiblePos>=(posible-5)) {
+                if (myLastVisiblePos>=(posible-5) && posible>=6 && !favoriteView) {
                     //seardata next page
                     if(!isLoading()){
                         page++;
@@ -297,6 +493,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     }
+
 
 
 }

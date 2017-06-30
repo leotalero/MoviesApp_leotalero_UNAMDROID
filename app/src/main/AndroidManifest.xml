@@ -24,6 +24,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <provider
+            android:name="com.unam.android.leonardotalero.moviesapp.data.MovieProvider"
+            android:authorities="com.unam.android.leonardotalero.moviesapp"
+            android:exported="false"/>
     </application>
 
 </manifest>

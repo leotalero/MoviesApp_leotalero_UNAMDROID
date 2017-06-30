@@ -29,6 +29,7 @@ public class NetworkUtils {
 
     final static String PARAM_API= "api_key";
     final static String PARAM_LANGUAGE="language";
+    final static String PARAM_LANGUAGE_default="en-US";
     final static String PARAM_PAGE="page";
     final static String PARAM_REGION="region";
     final static String PARAM_QUERY="query";
@@ -131,6 +132,45 @@ public class NetworkUtils {
         return url;
     }
 
+
+    //https://api.themoviedb.org/3/movie/297762/videos
+    public static URL buildUrlVideos(int idMovie) {
+
+        Uri builtUri = Uri.parse(BASE_URL+"movie/"+idMovie+"/videos")
+                .buildUpon()
+                .appendQueryParameter(PARAM_API, API_KEY)
+                .appendQueryParameter(PARAM_LANGUAGE,PARAM_LANGUAGE_default )
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+
+    //https://api.themoviedb.org/3/movie/297762/reviews
+    public static URL buildUrlReviews(int idMovie) {
+
+        Uri builtUri = Uri.parse(BASE_URL+"movie/"+idMovie+"/reviews")
+                .buildUpon()
+                .appendQueryParameter(PARAM_API, API_KEY)
+                .appendQueryParameter(PARAM_LANGUAGE,PARAM_LANGUAGE_default )
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
     /**
      * This method returns the entire result from the HTTP response.
      *
