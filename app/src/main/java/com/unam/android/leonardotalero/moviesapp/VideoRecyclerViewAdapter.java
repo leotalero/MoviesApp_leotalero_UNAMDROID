@@ -16,6 +16,8 @@ import com.unam.android.leonardotalero.moviesapp.VideoFragment.OnListFragmentInt
 
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Video} and makes a call to the
@@ -65,13 +67,34 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<VideoRecycler
 
     private void showVideo(Context context, String mLink, String key) {
 
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
-        Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://www.youtube.com/watch?v=" + key));
+
+        //Intent appIntent = new Intent(Intent.ACTION_SEND, Uri.parse("vnd.youtube:" + key));
+        //appIntent.setType("video/*");
+
+        Intent appIntent = new Intent(Intent.ACTION_SEND, Uri.parse("vnd.youtube:" + key));
+
+        Intent lVideoIntent = new Intent(
+                null,
+                Uri.parse("ytv://" + key));
+
+
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setDataAndType(Uri.parse("http://www.youtube.com/watch?v=" + key),"text/plain");
+
+
+
         try {
-            context.startActivity(appIntent);
+
+            Intent chooser = Intent.createChooser(appIntent, "ShowVideo");
+            if (appIntent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(chooser);
+            }else{
+                context.startActivity(i);
+            }
+
+            //context.startActivity(appIntent);
         } catch (ActivityNotFoundException ex) {
-            context.startActivity(webIntent);
+            throw  new ActivityNotFoundException();
         }
 
     }

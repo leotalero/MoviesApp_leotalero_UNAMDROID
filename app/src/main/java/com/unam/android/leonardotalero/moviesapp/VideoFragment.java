@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -41,7 +42,10 @@ public class VideoFragment extends Fragment implements LoaderManager.LoaderCallb
     private List<Video> mVideos=new ArrayList<Video>();
     private int mIdmovie;
     private VideoRecyclerViewAdapter adapter;
-    private ArrayList<Video> resultVideos;
+    private ArrayList<Video> resultVideos=new ArrayList<Video>();
+    private RecyclerView recyclerView;
+    private Parcelable mListState;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -89,8 +93,16 @@ public class VideoFragment extends Fragment implements LoaderManager.LoaderCallb
                // new VideosTask().execute(UrlVideos);
 
         }else{
+
            // resultVideos = savedInstanceState.getParcelableArrayList("resultVideo");
            // mVideos.addAll(resultVideos);
+             mListState = savedInstanceState.getParcelable("recyclerViewState");
+            // getting recyclerview items
+            resultVideos = savedInstanceState.getParcelableArrayList("resultVideo");
+
+            // Restoring adapter items
+            // Restoring recycler view position
+           // recyclerView.getLayoutManager().onRestoreInstanceState(mListState);
         }
 
 
@@ -106,7 +118,7 @@ public class VideoFragment extends Fragment implements LoaderManager.LoaderCallb
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+             recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -114,8 +126,13 @@ public class VideoFragment extends Fragment implements LoaderManager.LoaderCallb
             }
             adapter= new VideoRecyclerViewAdapter(
                     mVideos, mListener);
-
+            resultVideos.addAll(mVideos);
             recyclerView.setAdapter(adapter);
+
+            if(mListState!=null){
+               // recyclerView.getLayoutManager().onRestoreInstanceState(mListState);
+            }
+
         }
         return view;
     }
@@ -178,12 +195,16 @@ public class VideoFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
 
-/*
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("resultVideo", resultVideos);
+        Parcelable listState = recyclerView.getLayoutManager().onSaveInstanceState();
+        // putting recyclerview position
+        outState.putParcelable("recyclerViewState", listState);
+
         super.onSaveInstanceState(outState);
     }
 
-*/
+
 }

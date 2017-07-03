@@ -9,6 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.unam.android.leonardotalero.moviesapp.DetailActivity">
     <ScrollView
+        android:id="@+id/scroll_v"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

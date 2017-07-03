@@ -6,7 +6,11 @@ package com.unam.android.leonardotalero.moviesapp.utilities;
 
 
 import android.net.Uri;
+//import android.support.constraint.BuildConfig;
 
+import com.unam.android.leonardotalero.moviesapp.BuildConfig;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -15,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -22,7 +27,10 @@ import java.util.Scanner;
  */
 public class NetworkUtils {
     //"http://api.themoviedb.org/3/movie/popular?api_key=[YOUR_API_KEY]";
-    final static String API_KEY="647f581dfe7f1faf564e531821cf1657";
+    //final static String API_KEY="647f581dfe7f1faf564e531821cf1657";
+
+
+    final static String API_KEY= (BuildConfig.THE_MOVIE_DB_API_TOKEN);
     final static String BASE_URL =
             "http://api.themoviedb.org/3/";
     final static  String BASE_URL_IMAGE="http://image.tmdb.org/t/p/w342/";
@@ -181,6 +189,8 @@ public class NetworkUtils {
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
+            urlConnection.setConnectTimeout(5000);
+            urlConnection.setReadTimeout(10000);
             InputStream in = urlConnection.getInputStream();
 
             Scanner scanner = new Scanner(in);
@@ -208,5 +218,25 @@ public class NetworkUtils {
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    public static void readFileProperties(){
+        Properties prop = new Properties();
+        InputStream input = null;
+
+        try {
+
+            input = new FileInputStream("gradle.properties");
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property value and print it out
+            System.out.println(prop.getProperty("user.password"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
     }
 }

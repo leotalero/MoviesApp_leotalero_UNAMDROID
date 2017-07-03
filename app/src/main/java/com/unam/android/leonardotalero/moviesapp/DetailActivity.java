@@ -76,7 +76,7 @@ public class DetailActivity extends AppCompatActivity implements
         resultVideos=new ArrayList<Video>();
         if (intentThatStartedThisActivity != null) {
             if (intentThatStartedThisActivity.hasExtra("MovieObject")) {
-                mMovie = (MovieClass) intentThatStartedThisActivity.getExtras().getParcelable("MovieObject");
+                mMovie = intentThatStartedThisActivity.getExtras().getParcelable("MovieObject");
                 fillData(mMovie);
             }
         }
@@ -184,6 +184,7 @@ public class DetailActivity extends AppCompatActivity implements
             mFavoritebutton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_yellow));
 
         }
+        cursor.close();
     }
 
     private void deleteInFavorites(MovieClass mMovie, List<Video> mVideos, List<Review> mReview) {
@@ -316,7 +317,7 @@ public class DetailActivity extends AppCompatActivity implements
         );
 
             isInFavorites =true;
-        
+
 
         fillData(movie);
 
@@ -510,6 +511,7 @@ public class DetailActivity extends AppCompatActivity implements
         outState.putParcelableArrayList("resultVideos", resultVideos);
         outState.putParcelableArrayList("resultReviews", resultReviews);
         outState.putBoolean("isInFavorites", isInFavorites);
+
         super.onSaveInstanceState(outState);
     }
 

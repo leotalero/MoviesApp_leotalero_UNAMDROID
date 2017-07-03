@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements
     private static int LOADER_ID=10;
     private  URL SearchUrl;
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int TASK_LOADER_ID = 10;
+    //private static final int TASK_LOADER_ID = 10;
     private Loader<List<MovieClass>> loader;
     private List<MovieClass> moviesFavorite=new ArrayList<MovieClass>();
     private boolean favoriteView=false;
@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements
                 Class destinationClass = DetailActivity.class;
                 Intent intentToStartDetailActivity = new Intent(context, destinationClass);
                 MovieClass movieSelected=resultMovies.get(position);
-                intentToStartDetailActivity.putExtra("MovieObject" , (Parcelable) movieSelected);
+                intentToStartDetailActivity.putExtra("MovieObject" , movieSelected);
                 startActivity(intentToStartDetailActivity);
 
             }
@@ -487,11 +487,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
     public boolean isLoading(){
-        if(flagLoadingData){
-            return true;
-        }else {
-            return false;
-        }
+        return flagLoadingData;
     }
 
 
